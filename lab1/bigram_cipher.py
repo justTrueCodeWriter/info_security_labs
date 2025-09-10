@@ -19,17 +19,38 @@ def create_bigrams(plaintext: str) -> list:
     bigrams = []
   
     i = 0
+    space_pos_plaintext = 0
+    last_space_scan = []
     while i < len(plaintext):
         a = plaintext[i]
         if i + 1 < len(plaintext):
             b = plaintext[i+1]
+            
+            # if a == " ":
+            #     space_pos_plaintext = i
+            #     last_space_scan = bigrams.copy()
+            #
+            # elif b == " ":
+            #     space_pos_plaintext = i+1
+            #     last_space_scan = bigrams.copy()
+            #
+            # if a == b:
+            #     print(f"{a=} {b=}")
+            #     print("Space position", space_pos_plaintext, end="\n\n")
+            #     tmp = plaintext[0:space_pos_plaintext] + " " + plaintext[space_pos_plaintext:len(plaintext)] 
+            #     plaintext = tmp
+            #     i = space_pos_plaintext
+            #     bigrams = last_space_scan.copy()
+            #     print("Bigrams duplicating ", (a, b))
+
             bigrams.append((a, b))
             i += 2
-            if a == b:
-                print("Bigrams duplicating ", (a, b))
         else:
             bigrams.append((a, " "))
             i += 2
+
+    #print(plaintext)
+    print(*bigrams, end="\n\n")
 
     return bigrams
 
@@ -145,12 +166,11 @@ def cipher_cli():
 
 if __name__ == "__main__":
     cipher_cli()
+    #plaintext = "ТАК ГОВОРИЛА В ИЮЛЕ 1805 ГОДА ИЗВЕСТНАЯ АННА ПАВЛОВНА ШЕРЕР, ФРЕЙЛИНА И ПРИБЛИЖЕННАЯ ИМПЕРАТРИЦЫ МАРИИ ФЕОДОРОВНЫ, ВСТРЕЧАЯ ВАЖНОГО И ЧИНОВНОГО КНЯЗЯ ВАСИЛИЯ, ПЕРВОГО ПРИЕХАВШЕГО НА ЕЕ ВЕЧЕР"
     # plaintext = "У БУРНЫХ ЧУВСТВ НЕИСТОВЫЙ КОНЕЦ"
-    # key = "КРИПТЕСАБВГДЁЖЗЙЛМНОУФХЦЧШЩЪЫЬЭЮЯ ,.-:0123456789"
+    #key = "КРИПТЕСАБВГДЁЖЗЙЛМНОУФХЦЧШЩЪЫЬЭЮЯ ,.-:0123456789"
     #
     # print_alphabet(key, 6)
-    #
-    # cipher_text = encrypt(plaintext, key, 6)
-    #
-    # decrypt(cipher_text, key, 6)
+    #cipher_text = encrypt(plaintext, key, 6)
+    #decrypt(cipher_text, key, 6)
 
