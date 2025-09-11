@@ -5,12 +5,16 @@ import argparse
 
 #ALPHABET = "ЩС0УФ8ЪЖГ.4ПЯ Р9ЛЗВ,Ь:3ЧШТЁЭ1ОЙД5ЫИ6-НКАБМ2ЦЕЮ7Х"
 
-#assert len(ALPHABET) == 48, f"Ожидалось 48 символов, получили {len(ALPHABET)}"
-
 def encrypt(plaintext: str, key: str, cols: int):
+
+    if len(key) % cols != 0:
+        print("Incorrect amount of symbols in key")
+
     encrypted_text = ""
 
     for character in plaintext:
+        if character not in key:
+            raise ValueError(f"Symbol '{character}' not in key")
         pos = key.find(character)
         encrypted_text += key[(pos+cols)%len(key)]
 
@@ -19,6 +23,10 @@ def encrypt(plaintext: str, key: str, cols: int):
 
 
 def decrypt(encrypted_text: str, key: str, cols: int):
+
+    if len(key) % cols != 0:
+        print("Incorrect amount of symbols in key")
+
     decrypted_text = ""
    
     for character in encrypted_text:
@@ -54,7 +62,7 @@ def cipher_cli():
     parser.add_argument("--decrypt", type=str)
     parser.add_argument("--output", type=str)
     parser.add_argument("--cols", type=int)
-    parser.add_argument("pkey", required=False)
+    parser.add_argument("pkey", nargs="?")
 
     args = parser.parse_args()
 
@@ -88,3 +96,4 @@ def cipher_cli():
 
 if __name__ == "__main__":
     cipher_cli()
+

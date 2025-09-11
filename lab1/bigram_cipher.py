@@ -15,36 +15,42 @@ def create_table(key: str, cols: int):
                 pos[ch] = (r, c)
     return table, pos, rows, cols
 
-def create_bigrams(plaintext: str) -> list:
+def create_bigrams(plaintext: str, key: str) -> list:
     bigrams = []
   
     i = 0
-    space_pos_plaintext = 0
+    space_pos_plaintext = -1
     last_space_scan = []
     while i < len(plaintext):
         a = plaintext[i]
+        if a not in key:
+            raise ValueError(f"Symbol '{a}' not in key")
         if i + 1 < len(plaintext):
             b = plaintext[i+1]
+            if b not in key:
+                raise ValueError(f"Symbol '{b}' not in key")
             
-            # if a == " ":
-            #     space_pos_plaintext = i
-            #     last_space_scan = bigrams.copy()
-            #
-            # elif b == " ":
-            #     space_pos_plaintext = i+1
-            #     last_space_scan = bigrams.copy()
-            #
-            # if a == b:
-            #     print(f"{a=} {b=}")
-            #     print("Space position", space_pos_plaintext, end="\n\n")
-            #     tmp = plaintext[0:space_pos_plaintext] + " " + plaintext[space_pos_plaintext:len(plaintext)] 
-            #     plaintext = tmp
-            #     i = space_pos_plaintext
-            #     bigrams = last_space_scan.copy()
-            #     print("Bigrams duplicating ", (a, b))
+            if a == " ":
+                space_pos_plaintext = i
+                last_space_scan = bigrams.copy()
 
-            bigrams.append((a, b))
-            i += 2
+            elif b == " ":
+                space_pos_plaintext = i+1
+                last_space_scan = bigrams.copy()
+
+            if a == b and space_pos_plaintext != -1:
+                print(f"{a=} {b=}")
+                print("Space position", space_pos_plaintext, end="\n\n")
+                tmp = plaintext[0:space_pos_plaintext] + " " + plaintext[space_pos_plaintext:len(plaintext)] 
+                plaintext = tmp
+                i = space_pos_plaintext-1
+                bigrams = last_space_scan.copy()
+                print("Bigrams duplicating ", (a, b))
+                space_pos_plaintext = -1
+
+            else:
+                bigrams.append((a, b))
+                i += 2
         else:
             bigrams.append((a, " "))
             i += 2
@@ -55,7 +61,11 @@ def create_bigrams(plaintext: str) -> list:
     return bigrams
 
 def encrypt(plaintext: str, key: str, cols: int) -> str:
-    bigrams = create_bigrams(plaintext)
+
+    if len(key) % cols != 0:
+        raise ValueError("Incorrect amount of symbols in key")
+
+    bigrams = create_bigrams(plaintext, key)
 
     table, pos, rows, cols = create_table(key, cols)
     out_chars = []
@@ -83,6 +93,10 @@ def encrypt(plaintext: str, key: str, cols: int) -> str:
     return cipher_text
 
 def decrypt(cipher_text: str, key: str, cols: int) -> str:
+
+    if len(key) % cols != 0:
+        print("Incorrect amount of symbols in key")
+
     table, pos, rows, cols = create_table(key, cols)
     text = list(cipher_text)
     out_chars = []
