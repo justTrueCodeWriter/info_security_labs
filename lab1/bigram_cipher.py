@@ -29,11 +29,13 @@ def create_bigrams(plaintext: str, key: str) -> list:
     while i < len(plaintext):
         a = plaintext[i]
         if a not in key:
-            raise ValueError(f"Symbol '{a}' not in key")
+           print(f"Symbol '{a}' not in key")
+           exit()
         if i + 1 < len(plaintext):
             b = plaintext[i+1]
             if b not in key:
-                raise ValueError(f"Symbol '{b}' not in key")
+                print(f"Symbol '{b}' not in key")
+                exit()
             
             if a == " " and b == " ":
                 option = FIRST_OPTION
@@ -49,8 +51,6 @@ def create_bigrams(plaintext: str, key: str) -> list:
                 option = SECOND_OPTION
 
             if a == b and space_pos_plaintext != -1 and space_pos_plaintext != 0:
-                print(f"{a=} {b=}")
-                print("Space position", space_pos_plaintext, end="\n\n")
                 tmp = plaintext[0:space_pos_plaintext] + " " + plaintext[space_pos_plaintext:len(plaintext)] 
                 plaintext = tmp
 
@@ -62,17 +62,13 @@ def create_bigrams(plaintext: str, key: str) -> list:
                     i = space_pos_plaintext
 
                 bigrams = last_space_scan.copy()
-                print("Bigrams duplicating ", (a, b))
                 space_pos_plaintext = -1
 
             elif a == b and space_pos_plaintext == 0:
-                print(f"{a=} {b=}")
-                print("Space position", space_pos_plaintext, end="\n\n")
                 tmp = " " + plaintext
                 plaintext = tmp
                 i = space_pos_plaintext
                 bigrams = last_space_scan.copy()
-                print("Bigrams duplicating ", (a, b))
                 space_pos_plaintext = -1
 
             else:
@@ -82,17 +78,13 @@ def create_bigrams(plaintext: str, key: str) -> list:
             bigrams.append((a, " "))
             i += 2
 
-        print(f"{plaintext}", *bigrams, space_pos_plaintext)
-
-    #print(plaintext)
-    print(*bigrams, end="\n\n")
-
     return bigrams
 
 def encrypt(plaintext: str, key: str, cols: int) -> str:
 
     if len(key) % cols != 0:
-        raise ValueError("Incorrect amount of symbols in key")
+        print("Incorrect amount of symbols in key")
+        exit()
 
     bigrams = create_bigrams(plaintext, key)
 
@@ -128,6 +120,7 @@ def decrypt(cipher_text: str, key: str, cols: int) -> str:
 
     if len(key) % cols != 0:
         print("Incorrect amount of symbols in key")
+        exit()
 
     table, pos, rows, cols = create_table(key, cols)
     text = list(cipher_text)
@@ -218,11 +211,4 @@ def cipher_cli():
 
 if __name__ == "__main__":
     cipher_cli()
-    #plaintext = "ТАК ГОВОРИЛА В ИЮЛЕ 1805 ГОДА ИЗВЕСТНАЯ АННА ПАВЛОВНА ШЕРЕР, ФРЕЙЛИНА И ПРИБЛИЖЕННАЯ ИМПЕРАТРИЦЫ МАРИИ ФЕОДОРОВНЫ, ВСТРЕЧАЯ ВАЖНОГО И ЧИНОВНОГО КНЯЗЯ ВАСИЛИЯ, ПЕРВОГО ПРИЕХАВШЕГО НА ЕЕ ВЕЧЕР"
-    # plaintext = "У БУРНЫХ ЧУВСТВ НЕИСТОВЫЙ КОНЕЦ"
-    #key = "КРИПТЕСАБВГДЁЖЗЙЛМНОУФХЦЧШЩЪЫЬЭЮЯ ,.-:0123456789"
-    #
-    # print_alphabet(key, 6)
-    #cipher_text = encrypt(plaintext, key, 6)
-    #decrypt(cipher_text, key, 6)
 
