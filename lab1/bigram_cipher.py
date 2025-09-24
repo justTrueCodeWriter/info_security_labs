@@ -17,9 +17,14 @@ def create_table(key: str, cols: int):
 
 def create_bigrams(plaintext: str, key: str) -> list:
     bigrams = []
+
+    FIRST_OPTION = 0
+    SECOND_OPTION = 1
+    THIRD_OPTION = 2
+    option = FIRST_OPTION
   
     i = 0
-    space_pos_plaintext = -1
+    space_pos_plaintext = 0
     last_space_scan = []
     while i < len(plaintext):
         a = plaintext[i]
@@ -30,20 +35,42 @@ def create_bigrams(plaintext: str, key: str) -> list:
             if b not in key:
                 raise ValueError(f"Symbol '{b}' not in key")
             
-            if a == " ":
+            if a == " " and b == " ":
+                option = FIRST_OPTION
+
+            elif a == " ":
                 space_pos_plaintext = i
                 last_space_scan = bigrams.copy()
+                option = THIRD_OPTION
 
             elif b == " ":
                 space_pos_plaintext = i+1
                 last_space_scan = bigrams.copy()
+                option = SECOND_OPTION
 
-            if a == b and space_pos_plaintext != -1:
+            if a == b and space_pos_plaintext != -1 and space_pos_plaintext != 0:
                 print(f"{a=} {b=}")
                 print("Space position", space_pos_plaintext, end="\n\n")
                 tmp = plaintext[0:space_pos_plaintext] + " " + plaintext[space_pos_plaintext:len(plaintext)] 
                 plaintext = tmp
-                i = space_pos_plaintext-1
+
+                if option == FIRST_OPTION:
+                    i = space_pos_plaintext+2
+                elif option == SECOND_OPTION:
+                    i = space_pos_plaintext-1
+                elif option == THIRD_OPTION:
+                    i = space_pos_plaintext
+
+                bigrams = last_space_scan.copy()
+                print("Bigrams duplicating ", (a, b))
+                space_pos_plaintext = -1
+
+            elif a == b and space_pos_plaintext == 0:
+                print(f"{a=} {b=}")
+                print("Space position", space_pos_plaintext, end="\n\n")
+                tmp = " " + plaintext
+                plaintext = tmp
+                i = space_pos_plaintext
                 bigrams = last_space_scan.copy()
                 print("Bigrams duplicating ", (a, b))
                 space_pos_plaintext = -1
@@ -54,6 +81,8 @@ def create_bigrams(plaintext: str, key: str) -> list:
         else:
             bigrams.append((a, " "))
             i += 2
+
+        print(f"{plaintext}", *bigrams, space_pos_plaintext)
 
     #print(plaintext)
     print(*bigrams, end="\n\n")
@@ -87,6 +116,9 @@ def encrypt(plaintext: str, key: str, cols: int) -> str:
         out_chars.append(ca)
         out_chars.append(cb)
 
+        print(f"{a=} => {ca=}")
+        print(f"{b=} => {cb=}", end="\n\n")
+
     cipher_text = "".join(out_chars)
 
     print(cipher_text)
@@ -115,9 +147,15 @@ def decrypt(cipher_text: str, key: str, cols: int) -> str:
         else:
             da = table[r1][c2]
             db = table[r2][c1]
+
         out_chars.append(da)
         out_chars.append(db)
+
+        print(f"{a=} => {da=}")
+        print(f"{b=} => {db=}", end="\n\n")
+
     plaintext = "".join(out_chars)
+
     print(plaintext)
     return plaintext
 
@@ -141,12 +179,12 @@ def write_file(output: str, filename: str):
 def cipher_cli():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--key", type=str)
-    parser.add_argument("--encrypt", type=str)
-    parser.add_argument("--decrypt", type=str)
-    parser.add_argument("--output", type=str)
-    parser.add_argument("--cols", type=int)
-    parser.add_argument("pkey", nargs="?")
+    parser.add_argument("--key", type=str, help="key filename")
+    parser.add_argument("--encrypt", type=str, help="encrypt filename")
+    parser.add_argument("--decrypt", type=str, help="decrypt filename")
+    parser.add_argument("--output", type=str, help="output filename")
+    parser.add_argument("--cols", type=int, help="amount of cols")
+    parser.add_argument("pkey", nargs="?", help="print key")
 
     args = parser.parse_args()
 
